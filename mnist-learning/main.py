@@ -20,6 +20,28 @@ W = tf.Variable(tf.zeros([784,10]))
 b = tf.Variable(tf.zeros([10]))
 
 # softmax 激活函数 output layer
-y = tf.nn.softmax(tf.matmul(x,W)+b)
+y_ = tf.nn.softmax(tf.matmul(x,W)+b)
+
+# y 的输入正确值
+y = tf.placeholder("float",[None, 10])
 
 # 交叉熵
+cross_entropy = -tf.reduce_sum(y*tf.log(y_))
+
+# 使用梯度下降算法最小化交叉熵
+
+train = tf.train.GradientDescentOptimizer(0.01).minimize(cross_entropy)
+
+init_op = tf.global_variables_initializer()
+
+sess = tf.Session()
+
+sess.run(init_op)
+
+for i in range(1000):
+    batch_xs, batch_ys = mnist.train.next_batch(100)
+    aspdd = sess.run(train,{x:batch_xs,y:batch_ys})
+
+correct_prediction = tf.equal(tf.argmax(y,1),tf.argmax(y_,1))
+accuracy = tf.reduce_mean(tf.cast(correct_prediction,"float"))
+print(sess.run(accuracy,{x:mnist.test.images,y:mnist.test.labels}))
