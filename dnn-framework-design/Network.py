@@ -1,9 +1,11 @@
+# -*- coding:utf-8 -*-
 """
 Network
 """
 
+
 import numpy as np
-import tensorflow as tf
+# import tensorflow as tf
 import random
 
 
@@ -25,8 +27,8 @@ class NeuralNetwork:
     def feedForward(self, a):
         """输入一个向量a 返回sigmoid(-w*a+b)"""
         for w,b in zip(self.weights, self.biases):
-            output = sigmoid(np.dot(w,a)+b)
-        return output
+            a = self.sigmoid(np.dot(w,a)+b)
+        return a
 
     # 随机梯度下降
     def stochasticGradientDescent(self, training_data, epochs, mini_batch_size, learning_rate,test_data=None):
@@ -41,20 +43,20 @@ class NeuralNetwork:
         for j in range(epochs):
             random.shuffle(training_data)
 
-            mini_batches = [training_data[k:k+mini_batch_size] for k in range(0,n,mini_batch_size)]
-                for mini_batch in mini_batches:
-                    self.update_mini_batch(mini_batch,learning_rate)
-                if test_data:
-                    print("Epoch %s :  %s / %s" %(j,self.evaluate(test_data),numTest))
-                else:
-                    print("Epoch %s completed" %(j))
+            mini_batches = [training_data[k:k+mini_batch_size] for k in range(0,numTrain,mini_batch_size)]
+            for mini_batch in mini_batches:
+                self.update_mini_batch(mini_batch,learning_rate)
+            if test_data:
+                print("Epoch %s :  %s / %s" %(j,self.evaluate(test_data),numTest))
+            else:
+                print("Epoch %s completed" %(j))
 
     def update_mini_batch(self, mini_batch, learning_rate):
         """
         update the weights and bias by training the model
         ``mini_batch``  is a list of tuple (x,y)
         """
-        b = [np.zeros(b.shape)]
+        b = [np.zeros(b.shape) for b in self.biases]
         weight = [np.zeros(w.shape) for w in self.weights]
 
         for x,y in mini_batch:
@@ -80,9 +82,8 @@ class NeuralNetwork:
         for b,w in zip(self.biases, self.weights):
             z = np.dot(w,activation)+b
             zs.append(z)
-            activation = sigmoid(z)
+            activation = self.sigmoid(z)
             activations.append(activation)
-
         delta = self.cost_derivate(activations[-1],y) * self.sigmoid_prime(zs[-1])
 
         theta_b[-1] = delta
@@ -90,7 +91,7 @@ class NeuralNetwork:
 
         for l in range(2, self.numLayers):
             z = zs[-l]
-            sp = sigmoid_prime(z)
+            sp = self.sigmoid_prime(z)
             delta = np.dot(self.weights[-l+1].transpose(),delta)*sp
             theta_b[-l] = delta
             theta_weight[-l] = np.dot(delta,activations[-l-1].transpose())
