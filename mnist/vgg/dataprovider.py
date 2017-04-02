@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Author: VicCha
 # Date: 4/2/2017
-# Content: Data Provider
+# Content: MNIST Data Provider
 
 import numpy as np
 import struct
@@ -34,16 +34,22 @@ def readLabelFiles(fileName):
     labels = struct.unpack_from('>%sB'%nums, buf, index)
     binFile.close()
     labels = np.array(labels)
-    print(len(labels))
     return labels
 
 def fetchTraingSet():
-    pass
+    imageFile = '../MNIST_data/train-images-idx3-ubyte'
+    labelFile = '../MNIST_data/train-labels-idx1-ubyte'
+    images = readImageFiles(imageFile)
+    labels = readLabelFiles(labelFile)
+    return {'images': images,
+            'labels': labels}
+
 
 
 def fetchTestingSet():
-    pass
-
-
-#readFiles("../MNIST_data/train-images-idx3-ubyte")
-#readLabelFiles('../MNIST_data/train-labels-idx1-ubyte')
+    imageFile = '../MNIST_data/t10k-images-idx3-ubyte'
+    labelFile = '../MNIST_data/t10k-labels-idx1-ubyte'
+    images = readImageFiles(imageFile)
+    labels = readLabelFiles(labelFile)
+    return {'images': images,
+            'labels': labels}
