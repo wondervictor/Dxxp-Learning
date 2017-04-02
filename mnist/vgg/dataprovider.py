@@ -21,6 +21,7 @@ def readImageFiles(fileName):
         images = struct.unpack_from('>784B', buf, index)
         index += struct.calcsize('>784B')
         images = np.array(images)
+        images = images/255
         image_sets.append(image_sets)
     binFile.close()
     return image_sets
@@ -53,3 +54,22 @@ def fetchTestingSet():
     labels = readLabelFiles(labelFile)
     return {'images': images,
             'labels': labels}
+
+class MnistData():
+
+    def __init__(self):
+        trainSet = fetchTraingSet()
+        testSet = fetchTestingSet()
+        self._batchIndex = 0;
+        self._trainImages = trainSet['images']
+        self._trainLabels = trainSet['labels']
+
+        self._testImages = testSet['images']
+        self._testLabels = testSet['labels']
+
+    def next_batch(self, batchSize):
+        batchImages = self._trainImages[self._batchIndex: self._batchIndex+batchSize]
+        batchLabels = self._trainLabels[self._batchIndex: self._batchIndex+batchSize]
+        self._batchIndex += batchSize
+
+        return batchImages, batchLabels
